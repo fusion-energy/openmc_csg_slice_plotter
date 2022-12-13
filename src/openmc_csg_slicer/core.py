@@ -11,6 +11,8 @@ def check_for_inf_value(var_name, view_direction):
         raise ValueError(msg)
 
 
+
+
 def plot_surface_slice(
     surfaces,
     view_direction="x",
@@ -121,7 +123,7 @@ def plot_geometry_slice(
     slice_value=None,
     pixels=1000,
 ):
-    surfaces = get_all_surface(geometry_or_surfaces)
+    surfaces = get_all_surfaces(geometry_or_surfaces)
     bb = geometry.bounding_box
 
     if view_direction == "x":
@@ -150,7 +152,7 @@ def plot_geometry_slice(
         xlabel = "Y [cm]"
         ylabel = "Z [cm]"
 
-    elif view_direction == "y":
+    if view_direction == "y":
         # need plot_left, plot_right, plot_top, plot_bottom
 
         if plot_left is None:
@@ -176,7 +178,7 @@ def plot_geometry_slice(
         xlabel = "X [cm]"
         ylabel = "Z [cm]"
 
-    elif view_direction == "z":
+    if view_direction == "z":
         # need plot_left, plot_right, plot_top, plot_bottom
 
         if plot_left is None:
@@ -205,7 +207,7 @@ def plot_geometry_slice(
     else:
         raise ValueError("supported view_directions 'x', 'y' or 'z'")
     
-    plot = plot_surface_slice(
+    plot = plot_surfaces_slice(
         view_direction=view_direction,
         plot_left=plot_left,
         plot_right=plot_right,
