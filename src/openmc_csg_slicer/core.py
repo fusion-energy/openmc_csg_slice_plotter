@@ -10,6 +10,109 @@ def check_for_inf_value(var_name, view_direction):
         
         raise ValueError(msg)
 
+
+
+
+def plot_surfaces_slice(
+    surfaces,
+    view_direction="x",
+    plot_left=None,
+    plot_right=None,
+    plot_top=None,
+    plot_bottom=None,
+    slice_value=None,
+    pixels=1000,
+):
+    """Accepts an iterable of CSG surface and returns a Plotly figure"""
+
+    if view_direction == "x":
+        # need plot_left, plot_right, plot_top, plot_bottom
+
+        xlabel = "Y [cm]"
+        ylabel = "Z [cm]"
+
+    if view_direction == "y":
+        # need plot_left, plot_right, plot_top, plot_bottom
+        xlabel = "X [cm]"
+        ylabel = "Z [cm]"
+
+    if view_direction == "z":
+        # need plot_left, plot_right, plot_top, plot_bottom
+
+        xlabel = "X [cm]"
+        ylabel = "Y [cm]"
+
+    else:
+        raise ValueError("supported view_directions 'x', 'y' or 'z'")
+
+    plot_width = abs(plot_left - plot_right)
+    plot_height = abs(plot_bottom - plot_top)
+    aspect_ratio = plot_height / plot_width
+
+    numerator = math.sqrt(4 * aspect_ratio * pixels)
+    denominator = 2 * aspect_ratio
+
+    pixels_across = numerator / denominator
+    pixels_up = int(pixels / pixels_across)
+    pixels_across = int(pixels_across)
+
+    fig = go.Figure()
+
+    for surface in surfaces:
+        results_on_grid = []
+        for y in np.linspace(plot_top, plot_bottom, pixels_across):
+            grid_row = []
+            for x in np.linspace(plot_left, plot_right, pixels_up):
+                if view_direction == "z":
+                    grid_row.append(surface.evaluate((x, y, slice_value)))
+                if view_direction == "x":
+                    grid_row.append(surface.evaluate((slice_value, x, y)))
+                if view_direction == "y":
+                    grid_row.append(surface.evaluate((x, slice_value, y)))
+
+            results_on_grid.append(grid_row)
+        
+        rand_c = np.random.rand(3,)
+        color = f"rgb{rand_c[0],rand_c[1],rand_c[2]}"
+        print(color)
+        # color="rgb(0,0,0)"
+        fig.add_trace(
+            go.Contour(
+                z=results_on_grid,
+                ncontours=1,
+                contours_coloring="lines",
+                line_width=2,
+                x0=plot_left,
+                dx=abs(plot_left - plot_right) / (len(results_on_grid[0]) - 1),
+                y0=plot_bottom,
+                dy=abs(plot_bottom - plot_top) / (len(results_on_grid) - 1),
+                colorscale=[[0, color], [1, color]],
+                name=f"ID={surface.id} Name={surface.name}",
+                contours={"value": 0},
+                texttemplate="ds",
+                hoverinfo="all",
+                showlegend =True
+                # colorscale =[[0,]]
+            )
+        )
+        print(surface.name)
+
+    fig.update_traces(line={"color": "rgb(0,0,0)"})
+    fig.update_layout(
+        xaxis={"title": x_label},
+        yaxis={"title": y_label},
+        autosize=False,
+        height=800,
+
+        # showlegend=True,
+    )
+    fig.update_yaxes(
+        scaleanchor="x",
+        scaleratio=1,
+    )
+    return fig
+
+
 def plot_geometry_slice(
     geometry,
     view_direction="x",
@@ -104,7 +207,7 @@ def plot_geometry_slice(
     else:
         raise ValueError("supported view_directions 'x', 'y' or 'z'")
     
-    plot_surfaces_slice(
+    plot = plot_surfaces_slice(
         view_direction=view_direction,
         plot_left=plot_left,
         plot_right=plot_right,
@@ -114,121 +217,4 @@ def plot_geometry_slice(
         pixels=pixels
     )
 
-def plot_surfaces_slice(
-    surfaces,
-    view_direction="x",
-    plot_left=None,
-    plot_right=None,
-    plot_top=None,
-    plot_bottom=None,
-    slice_value=None,
-    pixels=1000,
-)
-    """Accepts a CSG surface and returns a"""
-
-    if isinstance(geometry_or_surfaces, openmc.Geometry()):
-
-        
-    
-
-
-    if view_direction == "x":
-        # need plot_left, plot_right, plot_top, plot_bottom
-
-        xlabel = "Y [cm]"
-        ylabel = "Z [cm]"
-
-    if view_direction == "y":
-        # need plot_left, plot_right, plot_top, plot_bottom
-        xlabel = "X [cm]"
-        ylabel = "Z [cm]"
-
-    if view_direction == "z":
-        # need plot_left, plot_right, plot_top, plot_bottom
-
-        xlabel = "X [cm]"
-        ylabel = "Y [cm]"
-
-    else:
-        raise ValueError("supported view_directions 'x', 'y' or 'z'")
-
-    plot_width = abs(plot_left - plot_right)
-    plot_height = abs(plot_bottom - plot_top)
-    aspect_ratio = plot_height / plot_width
-
-    numerator = math.sqrt(4 * aspect_ratio * pixels)
-    denominator = 2 * aspect_ratio
-
-    pixels_across = numerator / denominator
-    pixels_up = int(pixels / pixels_across)
-    pixels_across = int(pixels_across)
-
-    fig = go.Figure()
-
-    for surface in surfaces:
-        results_on_grid = []
-        for y in np.linspace(plot_top, plot_bottom, pixels_across):
-            grid_row = []
-            for x in np.linspace(plot_left, plot_right, pixels_up):
-                if view_direction == "z":
-                    grid_row.append(surface.evaluate((x, y, slice_value)))
-                if view_direction == "x":
-                    grid_row.append(surface.evaluate((slice_value, x, y)))
-                if view_direction == "y":
-                    grid_row.append(surface.evaluate((x, slice_value, y)))
-
-            results_on_grid.append(grid_row)
-        
-        rand_c = np.random.rand(3,)
-        color = f"rgb{rand_c[0],rand_c[1],rand_c[2]}"
-        print(color)
-        # color="rgb(0,0,0)"
-        fig.add_trace(
-            go.Contour(
-                z=results_on_grid,
-                ncontours=1,
-                contours_coloring="lines",
-                line_width=2,
-                x0=plot_left,
-                dx=abs(plot_left - plot_right) / (len(results_on_grid[0]) - 1),
-                y0=plot_bottom,
-                dy=abs(plot_bottom - plot_top) / (len(results_on_grid) - 1),
-                colorscale=[[0, color], [1, color]],
-                name=f"ID={surface.id} Name={surface.name}",
-                contours={"value": 0},
-                texttemplate="ds",
-                hoverinfo="all",
-                showlegend =True
-                # colorscale =[[0,]]
-            )
-        )
-        print(surface.name)
-
-    fig.update_traces(line={"color": "rgb(0,0,0)"})
-    fig.update_layout(
-        xaxis={"title": x_label},
-        yaxis={"title": y_label},
-        autosize=False,
-        height=800,
-
-        # showlegend=True,
-    )
-    fig.update_yaxes(
-        scaleanchor="x",
-        scaleratio=1,
-    )
-    fig.show()
-
-
-
-import openmc
-
-sphere1 = openmc.Sphere(r=10, name="sphere_r_10")
-sphere2 = openmc.Sphere(r=20, name="sphere_r_20")
-zplane = openmc.XPlane(x0=-5, name="zplane_z0_5")
-xcy = openmc.ZCylinder(r=15, name="ZCylinder")
-
-
-
-plot_axis_slice(surfaces=[sphere1, sphere2, zplane, xcy])
-
+    return plot
