@@ -3,7 +3,7 @@ requires = ["setuptools >= 65.4.0", "setuptools_scm[toml]>=7.0.5"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "openmc_geometry_plot"
+name = "openmc_csg_slice_plotter"
 authors = [
   { name="Jonathan Shimwell", email="mail@jshimwell.com" },
 ]
@@ -26,7 +26,7 @@ dynamic = ["version"]
 
 
 [tool.setuptools_scm]
-write_to = "src/openmc_geometry_plot/_version.py"
+write_to = "src/openmc_csg_slice_plotter/_version.py"
 
 
 [project.optional-dependencies]
@@ -35,11 +35,11 @@ tests = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/fusion-energy/openmc_geometry_plot"
-"Bug Tracker" = "https://github.com/fusion-energy/openmc_geometry_plot/issues"
+"Homepage" = "https://github.com/fusion-energy/openmc_csg_slice_plotter"
+"Bug Tracker" = "https://github.com/fusion-energy/openmc_csg_slice_plotter/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [project.scripts]
-openmc_geometry_plot = "openmc_geometry_plot.launch:main"
+openmc_csg_slice_plotter = "openmc_csg_slice_plotter.launch:main"

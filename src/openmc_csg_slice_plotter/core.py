@@ -11,8 +11,6 @@ def check_for_inf_value(var_name, view_direction):
         raise ValueError(msg)
 
 
-
-
 def plot_surfaces_slice(
     surfaces,
     view_direction="x",
